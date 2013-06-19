@@ -27,12 +27,14 @@ define contactgroup {
 }
 
 <% @admins.each do |a| -%>
+<% if !a['nagios']['email'].nil? and a['nagios']['email'].length > 0 -%>
 define contact {
   use          default-contact
   contact_name <%= a['id'] %>
   <%= "email  #{a['nagios']['email']}" unless a['nagios'].nil? || a['nagios']['email'].nil? %>
 }
 
+<% end -%>
 <% end -%>
 
 # Contacts from data bags
