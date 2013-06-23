@@ -183,7 +183,9 @@ end
 # pick up base contacts
 members = Array.new
 sysadmins.each do |s|
-  members << s['id']
+  if (! s['nagios']['email'].nil?)
+    members << s['id']
+  end
 end
 
 public_domain = node['public_domain'] || node['domain']
