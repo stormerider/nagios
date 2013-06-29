@@ -50,6 +50,7 @@ The following attributes are used by both client and server recipes.
 * `node['nagios']['group']` - Nagios group, default 'nagios'.
 * `node['nagios']['plugin_dir']` - location where Nagios plugins go, default '/usr/lib/nagios/plugins'.
 * `node['nagios']['multi_environment_monitoring']` - Chef server will monitor hosts in all environments, not just its own, default 'false'
+* `node['nagios']['search_filter']` - This is the Solr/Lucene search for finding the nodes to be monitored by Nagios. This defaults to `"hostname:[* TO *]"`. An example would be `"hostname:[* TO *] NOT chef_environment:_default"`.
 
 client
 ------

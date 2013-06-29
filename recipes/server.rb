@@ -102,9 +102,13 @@ nodes = Array.new
 hostgroups = Array.new
 
 if node['nagios']['multi_environment_monitoring']
-  nodes = search(:node, "hostname:[* TO *]")
+  node_search = "#{node['nagios']['search_filter']}"
+  Chef::Log.info "Nagios: multi_env = true, node_search = #{node_search}"
+  nodes = search(:node, node_search)
 else
-  nodes = search(:node, "hostname:[* TO *] AND chef_environment:#{node.chef_environment}")
+  node_search = "#{node['nagios']['search_filter']} AND chef_environment:#{node.chef_environment}"
+  Chef::Log.info "Nagios: multi_env = false, node_search = #{node_search}"
+  nodes = search(:node, node_search)
 end
 
 if nodes.empty?
@@ -168,13 +172,15 @@ if nagios_bags.bag_list.include?("nagios_hostgroups")
     hostgroup_list << hg['hostgroup_name']
     temp_hostgroup_array= Array.new
     if node['nagios']['multi_environment_monitoring']
-      search(:node, hg['search_query']) do |n|
-        temp_hostgroup_array << n['hostname']
-      end
+      # Build a dynamic query that works with normal filtering and matches the search query in the databag idem
+      hg_node_search = "#{node['nagios']['search_filter']} AND #{hg['search_query']}"
     else
-      search(:node, "#{hg['search_query']} AND chef_environment:#{node.chef_environment}") do |n|
-        temp_hostgroup_array << n['hostname']
-      end
+      # Build a dynamic query that works with normal filtering and matches the search query in the databag idem,
+      # also restricted by environment
+      hg_node_search = "#{node['nagios']['search_filter']} AND #{hg['search_query']} AND chef_environment:#{node.chef_environment}"
+    end
+    search(:node, hg_node_search) do |n|
+      temp_hostgroup_array << n['hostname']
     end
     hostgroup_nodes[hg['hostgroup_name']] = temp_hostgroup_array.join(",")
   end
