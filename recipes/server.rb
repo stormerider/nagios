@@ -172,12 +172,14 @@ if nagios_bags.bag_list.include?('nagios_hostgroups')
     temp_hostgroup_array = Array.new
     if node['nagios']['multi_environment_monitoring']
       # Build a dynamic query that works with normal filtering and matches the search query in the databag idem
-      hg_node_search = "#{node['nagios']['search_filter']} AND #{hg['search_query']}"
+      hg_node_search = "#{hg['search_query']} AND #{node['nagios']['search_filter']}"
     else
       # Build a dynamic query that works with normal filtering and matches the search query in the databag idem,
       # also restricted by environment
-      hg_node_search = "#{node['nagios']['search_filter']} AND #{hg['search_query']} AND chef_environment:#{node.chef_environment}"
+      hg_node_search = "#{hg['search_query']} AND #{node['nagios']['search_filter']} AND chef_environment:#{node.chef_environment}"
     end
+
+    Chef::Log.info("hg_node_search: #{hg_node_search}")
     search(:node, hg_node_search) do |n|
       temp_hostgroup_array << n[node['nagios']['host_name_attribute']]
     end
