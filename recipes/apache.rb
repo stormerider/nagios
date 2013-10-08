@@ -14,37 +14,34 @@
 # limitations under the License.
 #
 
-include_recipe "apache2"
-include_recipe "apache2::mod_rewrite"
-include_recipe "apache2::mod_php5"
+include_recipe 'apache2'
+include_recipe 'apache2::mod_rewrite'
+include_recipe 'apache2::mod_php5'
+include_recipe 'apache2::mod_ssl' if node['nagios']['enable_ssl']
 
-if node['nagios']['enable_ssl']
-  include_recipe "apache2::mod_ssl"
-end
-
-apache_site "000-default" do
+apache_site '000-default' do
   enable false
 end
 
 public_domain = node['public_domain'] || node['domain']
 
-template "#{node['apache']['dir']}/sites-available/nagios3.conf" do
-  source "apache2.conf.erb"
+template "#{node['apache']['dir']}/sites-available/#{node['nagios']['server']['vname']}.conf" do
+  source 'apache2.conf.erb'
   mode 00644
-  variables( 
+  variables(
     :public_domain => public_domain,
     :nagios_url    => node['nagios']['url'],
     :https         => node['nagios']['enable_ssl'],
     :ssl_cert_file => node['nagios']['ssl_cert_file'],
     :ssl_cert_key  => node['nagios']['ssl_cert_key']
   )
-  if ::File.symlink?("#{node['apache']['dir']}/sites-enabled/nagios3.conf")
-    notifies :reload, "service[apache2]"
+  if ::File.symlink?("#{node['apache']['dir']}/sites-enabled/#{node['nagios']['server']['vname']}.conf")
+    notifies :reload, 'service[apache2]'
   end
 end
 
-file "#{node['apache']['dir']}/conf.d/nagios3.conf" do
+file "#{node['apache']['dir']}/conf.d/#{node['nagios']['server']['vname']}.conf" do
   action :delete
 end
 
-apache_site "nagios3.conf"
+apache_site "#{node['nagios']['server']['vname']}.conf"

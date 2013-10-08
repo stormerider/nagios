@@ -7,7 +7,7 @@
 # Definition:: nagios_conf
 #
 # Copyright 2009, 37signals
-# Copyright 2009-2011, Opscode, Inc
+# Copyright 2009-2013, Opscode, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,17 +21,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-define :nagios_conf, :variables => {}, :config_subdir => true do
+define :nagios_conf, :variables => {}, :config_subdir => true, :source => nil do
 
   conf_dir = params[:config_subdir] ? node['nagios']['config_dir'] : node['nagios']['conf_dir']
+  params[:source] ||= "#{params[:name]}.cfg.erb"
 
   template "#{conf_dir}/#{params[:name]}.cfg" do
     owner node['nagios']['user']
     group node['nagios']['group']
-    source "#{params[:name]}.cfg.erb"
+    source params[:source]
     mode 00644
     variables params[:variables]
-    notifies :reload, "service[nagios]"
+    notifies :reload, 'service[nagios]'
     backup 0
   end
 end
