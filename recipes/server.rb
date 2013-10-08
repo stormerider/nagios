@@ -113,7 +113,7 @@ if nodes.empty?
 end
 
 # Sort by name to provide stable ordering
-nodes.sort! {|a,b| a.name.downcase <=> b.name.downcase }
+nodes.sort! {|a.downcase,b.downcase| a.name.downcase <=> b.name.downcase }
 
 # maps nodes into nagios hostgroups
 service_hosts= Hash.new
