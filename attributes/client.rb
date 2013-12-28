@@ -59,19 +59,23 @@ else
   default['nagios']['nrpe']['service_name']      = 'nrpe'
 end
 
-default['nagios']['nrpe']['conf_dir']          = '/etc/nagios'
-default['nagios']['nrpe']['dont_blame_nrpe']   = 0
-default['nagios']['nrpe']['command_timeout']   = 60
+default['nagios']['nrpe']['log_facility']       = nil
+default['nagios']['nrpe']['debug']              = 0
+default['nagios']['nrpe']['conf_dir']           = '/etc/nagios'
+default['nagios']['nrpe']['dont_blame_nrpe']    = 0
+default['nagios']['nrpe']['command_timeout']    = 60
+default['nagios']['nrpe']['connection_timeout'] = nil
 
 # for plugin from source installation
 default['nagios']['plugins']['url']      = 'https://www.nagios-plugins.org/download'
-default['nagios']['plugins']['version']  = '1.4.16'
-default['nagios']['plugins']['checksum'] = 'b0caf07e0084e9b7f10fdd71cbd3ebabcd85ad78df64da360b51233b0e73b2bd'
+default['nagios']['plugins']['version']  = '1.5'
+default['nagios']['plugins']['checksum'] = 'fcc55e23bbf1c70bcf1a90749d30249955d4668a9b776b2521da023c5c2f2170'
 
 # for nrpe from source installation
 default['nagios']['nrpe']['url']      = 'http://prdownloads.sourceforge.net/sourceforge/nagios'
-default['nagios']['nrpe']['version']  = '2.14'
-default['nagios']['nrpe']['checksum'] = '808c7c4a82d0addf15449663e4712b5018c8bbd668e46723139f731f1ac44431'
+default['nagios']['nrpe']['version']  = '2.15'
+default['nagios']['nrpe']['checksum'] = '66383b7d367de25ba031d37762d83e2b55de010c573009c6f58270b137131072'
 
 default['nagios']['server_role'] = 'monitoring'
 default['nagios']['allowed_hosts'] = nil
+default['nagios']['using_solo_search'] = false

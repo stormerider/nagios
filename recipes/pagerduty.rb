@@ -17,6 +17,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# TODO: remove when backward compatibility is dropped.
+def using_old_pagerduty_key_attribute?
+  node['nagios']['pagerduty_key'] &&
+  node['nagios']['pagerduty_key'] != node['nagios']['pagerduty']['key']
+end
+
+if using_old_pagerduty_key_attribute?
+  Chef::Log.warn('The nagios.pagerduty_key attribute is deprecated. It is replaced by the nagios.pagerduty.key attribute.')
+  Chef::Log.warn('Assigning nagios.pagerduty.key from nagios.pagerduty_key now.')
+  node.set['nagios']['pagerduty']['key'] = node['nagios']['pagerduty_key']
+end
+
 package 'libwww-perl' do
   case node['platform_family']
   when 'rhel', 'fedora'
@@ -49,10 +61,15 @@ remote_file "#{node['nagios']['plugin_dir']}/notify_pagerduty.pl" do
   action :create_if_missing
 end
 
-nagios_conf 'pagerduty'
+nagios_bags = NagiosDataBags.new
+pagerduty_contacts = nagios_bags.get('nagios_pagerduty')
+
+nagios_conf 'pagerduty' do
+  variables(:contacts => pagerduty_contacts)
+end
 
 cron 'Flush Pagerduty' do
   user node['nagios']['user']
   mailto 'root@localhost'
-  command "#{node['nagios']['plugin_dir']}/pagerduty_nagios.pl flush"
+  command "#{::File.join(node['nagios']['plugin_dir'], 'notify_pagerduty.pl')} flush"
 end
